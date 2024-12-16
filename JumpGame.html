@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" onclick="jump()" onkeydown="checkKey(event)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #f0f0f0;
+        }
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        #game {
+            width: 500px;
+            height: 200px;
+            border: 1px solid black;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #character {
+            width: 20px;
+            height: 50px;
+            position: relative;
+            top: 150px;
+            background-color: blue;
+        }
+        .animate {
+            animation: jump 500ms;
+        }
+        #block {
+            width: 20px;
+            height: 20px;
+            background-color: black;
+            position: relative;
+            top: 130px;
+            left: 580px;
+            animation: block 1.5s infinite linear;
+        }
+        #point {
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        button {
+            display: block;
+            margin: 0 auto 20px auto;
+            font-size: 24px;
+            padding: 10px 20px;
+        }
+        @keyframes jump {
+            0% { top: 150px; }
+            30% { top: 100px; }
+            70% { top: 100px; }
+            100% { top: 150px; }
+        }
+        @keyframes block {
+            0% { left: 480px; }
+            100% { left: -40px; }
+        }
+    </style>
+
+    <title>Basic Game</title>
+</head>
+<body>
+    
+    <div id="game">
+        <div id="character"> </div>
+        <div id="block"> </div>
+    </div>
+
+    <button onclick="togglePause()">Pause</button>
+    <div id="point"><p>Points: 0</p></div>
+
+    <script>
+        var character = document.getElementById("character");
+        var block = document.getElementById("block");
+        var point = document.getElementById("point").getElementsByTagName("p")[0];
+        var points = 0;
+        var isPaused = false;
+        
+        function jump() {
+            if (!isPaused && character.classList != "animate") {
+                character.classList.add("animate");
+            }
+            setTimeout(function() {
+                character.classList.remove("animate");
+            }, 500);
+        }
+
+        function checkKey(event) {
+            if (event.keyCode === 9) { // Tab key
+                jump();
+                event.preventDefault();
+            } else if (event.keyCode === 80) { // 'P' key to pause
+                togglePause();
+            }
+        }
+        
+        function togglePause() {
+            isPaused = !isPaused;
+            if (isPaused) {
+                block.style.animationPlayState = "paused";
+            } else {
+                block.style.animationPlayState = "running";
+            }
+        }
+
+        setInterval(function() {
+            if (!isPaused) {
+                var characterTop = parseInt(window.getComputedStyle(character).getPropertyValue("top"));
+                var blockLeft = parseInt(window.getComputedStyle(block).getPropertyValue("left"));
+                if (blockLeft < 20 && blockLeft > 0 && characterTop >= 130) {
+                    alert("Game Over");
+                    character.style.display = "none";
+                    block.style.display = "none";
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
+                } else if (blockLeft < 20 && blockLeft > 0 && characterTop < 130) {
+                    points += 5;
+                    point.textContent = "Points: " + points;
+                }
+            }
+        }, 10);
+    </script>
+</body>
+</html>
+
